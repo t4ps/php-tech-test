@@ -129,7 +129,7 @@ You must complete the `.gitignore` file yourself so that sensitive or unnecessar
 
 ## Time Limit
 
-This exercise is designed to be completed in 10–15 minutes.
+This exercise is designed to be completed in 15–20 minutes.
 
 ---
 
