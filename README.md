@@ -85,7 +85,7 @@
 
 php auth.php
 
-# => <long token string>
+# => [long token string]
 
 php app.php
 
