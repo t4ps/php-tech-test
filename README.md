@@ -2,151 +2,100 @@
 
 ## Getting Started
 
-1. Clone this repository
+1. The `.env` file is already provided.
 
-2. Create a new branch with your name
+2. Install the required Composer dependency:  
 
-3. Install the required Composer dependency: vlucas/phpdotenv
+3. For HTTP requests you may use:
+   * PHP cURL (native extension), or  
+   * `file_get_contents` with stream context, or  
+   * a Composer library of your choice (for example, `guzzlehttp/guzzle`).
 
-4. For HTTP requests you may use:
-
-   * PHP cURL (native extension), or
-   * file_get_contents with stream context, or
-   * a Composer library of your choice (for example, guzzlehttp/guzzle).
-
-5. Requirements:
-
-   * PHP 8+
-   * PDO SQLite or MySQL extension enabled (pdo_sqlite or pdo_mysql)
-
-6. The .env file is already provided.
+4. Requirements:
+   * PHP 8+  
+   * PDO SQLite or MySQL extension enabled (`pdo_sqlite` or `pdo_mysql`)
 
 ---
 
 ## Tasks
 
-### 1) auth.php
+### 1) divide.php
 
-* Load environment variables from .env using vlucas/phpdotenv.
-* Read GOREST_TOKEN from environment.
-* On success (non-empty token), print only the token to STDOUT.
-* On failure (missing/empty token), print AUTH_ERROR and exit with a non-zero status.
-
-### 2) app.php
-
-* Load environment variables from .env using vlucas/phpdotenv.
-
-* Implement:
-  function divide($a, $b)
-  Returns $a / $b. Throws an Exception if $b === 0.
-
-* Call divide(10, 2) and print the numeric result on its own line.
-  If an exception occurs, print ERROR and exit with non-zero status.
-
-* Make a GET request to ${API_URL}/users?per_page=1 with header:
-  Authorization: Bearer <GOREST_TOKEN>
-
-* If HTTP 200 and the response is valid JSON containing at least one user, print only the first user’s email (index 0 → email) on its own line.
-
-* On any API failure (bad token, non-200, invalid JSON, empty list), print API_ERROR and exit with a non-zero status.
-
-* Fetch posts from:
-  ${API_URL}/posts?per_page=5
-  Include the same Authorization header as above.
-  If HTTP 200 and valid JSON, store these posts into a local SQLite/MySQL database using PDO.
-
-* Database details (SQLite or MySQL):
-
-  SQLite
-  * Database path: DB_PATH from .env (e.g., ./database.sqlite)
-  * Create the database file if it does not exist.
-  * Create a table if it does not exist:
-    posts(id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT, body TEXT)
-  * Insert the fetched posts. Avoid duplicates using INSERT OR IGNORE.
-
-  MySQL
-  * Connect using environment variables: DB_DRIVER=mysql, DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
-  * Example DSN: mysql:host=${DB_HOST};port=${DB_PORT};dbname=${DB_NAME};charset=utf8mb4
-  * Create a table if it does not exist:
-    posts(id INT PRIMARY KEY, user_id INT, title TEXT, body TEXT)
-  * Insert the fetched posts. Avoid duplicates using INSERT IGNORE.
-
-* After inserting, print a third line:
-  STORED:<n>
-  where <n> is the number of posts inserted during this run (0–5).
-
-* Failure modes for posts:
-
-  * If the posts request fails, or JSON is invalid, or DB operations fail, print API_ERROR and exit with a non-zero status.
+* Implement a function called `divide($a, $b)` that divides two numbers.  
+* The function must throw an `Exception` if `$b === 0`.  
+* Call the function with the values `(10, 2)` and print the result.  
+* If an exception occurs, print `ERROR` and exit with a non-zero status.
 
 ---
 
-## Expected Output
+### 2) app.php
 
-php auth.php
+* Load environment variables from `.env` using `vlucas/phpdotenv`.  
+* Read `GOREST_TOKEN` and `API_URL` from the environment.  
+* If `GOREST_TOKEN` is missing or empty, print `AUTH_ERROR` and exit.  
 
-# => [long token string]
+* Make an HTTP GET request to `${API_URL}/users?per_page=1` using the header:  
+  `Authorization: Bearer <GOREST_TOKEN>`
 
-php app.php
+* If the response is successful and contains valid JSON, print the first user’s email on its own line.  
+* On any failure (invalid token, non-200 status, or invalid JSON), print `API_ERROR` and exit with a non-zero status.
 
-# =>
+* Fetch posts from `${API_URL}/posts?per_page=5` using the same Authorization header.  
+* Store these posts in a local SQLite or MySQL database using PDO.
 
-# 5
+---
 
-# [some.user@example.com](mailto:some.user@example.com)
+### Database Requirements
 
-# STORED:5
+**SQLite**  
+* Use `DB_PATH` from `.env` (e.g., `./database.sqlite`).  
+* Create the database file if it doesn’t exist.  
+* Create a table `posts` with columns:  
+  `id, user_id, title, body`.  
+* Insert fetched posts, avoiding duplicates.
 
-Notes:
+**MySQL**  
+* Connect using environment variables (`DB_DRIVER`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`).  
+* Create a table `posts` with columns:  
+  `id, user_id, title, body`.  
+* Insert fetched posts, avoiding duplicates.
 
-* The exact email depends on current API data.
-* STORED: value may be 0–5 depending on duplicates and API results.
+* After insertion, print `STORED:<n>` where `<n>` is the number of posts inserted.  
+
+* Handle all errors (API, DB, or invalid data) by printing `API_ERROR` and exiting with a non-zero status.
 
 ---
 
 ## Output Rules
 
-* auth.php prints either: <token>
-  or AUTH_ERROR
-* app.php prints exactly three lines on success:
+* `divide.php` prints:  
+  - The result of the division, or  
+  - `ERROR`
 
-  1. 5
-  2. <email>  
-  3. STORED:<n>
-* On failures:
+* `app.php` prints:  
+  1. The user email  
+  2. `STORED:<n>`
 
-  * divide() error → print ERROR
-  * any API or DB issue → print API_ERROR
-  * exit with non-zero status.
+* All other cases should result in `AUTH_ERROR` or `API_ERROR`.
 
 ---
 
 ## Git Ignore
 
-You must complete the `.gitignore` file yourself so that sensitive or unnecessary files are not committed
+Complete the `.gitignore` file so that sensitive or unnecessary files are not committed (for example: `vendor/`, `.env`, `database.sqlite`).
 
 ---
 
 ## Time Limit
 
-This exercise is designed to be completed in 15–20 minutes.
+This exercise is designed to be completed in **15–20 minutes**.
 
 ---
 
-## Bonus (Optional, if you finish early)
+## Bonus (Optional)
 
-* Validate DB_PATH exists in .env.
-* Add a single retry on non-200 responses.
-* Set short HTTP timeouts.
-* Wrap DB writes in a transaction.
+* Validate `.env` configuration.  
+* Retry once on failed API requests.  
+* Add request timeouts.  
+* Use transactions for database writes.  
 
----
-
-## MySQL .env example (optional)
-
-DB_DRIVER=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=php_tech_test
-DB_USER=root
-DB_PASS=secret
