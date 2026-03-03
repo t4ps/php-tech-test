@@ -2,7 +2,17 @@
 
 ## Getting Started
 
-1. The `.env` file is already provided.
+1. The `.env` file is already provided. It contains:
+   ```
+   GOREST_TOKEN=<your_token>
+   API_URL=https://gorest.co.in/public/v2
+   ```
+   To load these variables in your code, use `vlucas/phpdotenv`:
+   ```php
+   $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+   $dotenv->load();
+   ```
+   Variables are then accessible via `$_ENV['GOREST_TOKEN']` and `$_ENV['API_URL']`.
 
 2. Install the required Composer dependency: vlucas/phpdotenv
 
