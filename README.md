@@ -35,6 +35,48 @@ Write a reusable function `apiGet(string $url): array` that:
 
 You may define this function in `app.php` or in a separate file and `require` it.
 
+### Hints
+
+<details>
+<summary>cURL setup</summary>
+
+```php
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['x-api-key: ' . $_ENV['API_KEY']]);
+```
+</details>
+
+<details>
+<summary>Executing the request and checking for errors</summary>
+
+```php
+$response = curl_exec($ch);
+if ($response === false) {
+    throw new \Exception(curl_error($ch));
+}
+```
+</details>
+
+<details>
+<summary>Checking HTTP status code</summary>
+
+```php
+$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+// Don't forget to curl_close($ch)
+// Throw an exception if $statusCode is not 200
+```
+</details>
+
+<details>
+<summary>Decoding JSON</summary>
+
+```php
+$data = json_decode($response, true);
+// json_decode returns null on invalid JSON — check for that and throw if needed
+```
+</details>
+
 ---
 
 ## Task 2 — app.php
